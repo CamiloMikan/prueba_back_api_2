@@ -1,8 +1,8 @@
 from rest_framework import serializers
 from .models import Clients, Bills, Products
+from django.contrib.auth import get_user_model
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer as JwtTokenObtainPairSerializer
 from django.contrib.auth.models import User
-
-
 class ClientSerializer(serializers.ModelSerializer):
     class Meta:
         model = Clients
@@ -17,10 +17,28 @@ class BillSerializer(serializers.ModelSerializer):
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Products
-        fields = '__all__'
+        fields = '__all__'    
+class ClientImportSerializer(serializers.Serializer):
+    file = serializers.FileField()
+    
+  
+
+    
+class TokenObtainPairSerializer(JwtTokenObtainPairSerializer):
+    username_field = 'email' 
+
+    class Meta:
+        model = get_user_model()
+        fields = ('email', 'password')
+
 
 
 class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = get_user_model()
+        fields = ('email', 'password')
+        
+class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['username', 'email', 'password']
@@ -31,6 +49,3 @@ class UserSerializer(serializers.ModelSerializer):
         user.set_password(validated_data['password'])
         user.save()
         return user
-    
-class ClientImportSerializer(serializers.Serializer):
-    file = serializers.FileField()
